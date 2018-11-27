@@ -6,11 +6,22 @@ print ('Number of arguments:', len(sys.argv), 'arguments.')
 print ('Argument List:', str(sys.argv))
 
 columns = ['Tag','Validbit', 'data', 'timestamp']
-df= pd.DataFrame(columns=columns)
+
+cachedf= pd.DataFrame(columns=columns)
 print(df.columns)
 
+def Access(RW,addr):
+#Check if in cache
+#cut out the bits( determine setID)
+#search set determine if addr is in cache, tag comparison
+#check valid bit
 
-#def Access(RW,addr):
+#if hit
+# -update timestamp of cache line that was hit
 
-
-    
+# if miss
+#  -find slot
+#  -update slot
+#    -set valid bit to 1
+#    -update tag
+#    -update timestamp
