@@ -2,6 +2,8 @@
 
 import sys
 
+from cachesim import Access,cacheTracker,cache
+
 if len(sys.argv) < 2:
 	print("filename needed as command argument")
 	sys.exit(1)
@@ -39,8 +41,10 @@ while True:
 	else:
 		Access(dataTuple[1],dataTuple[2])
 
-def Access(RW,addr):
-	print(RW,addr)
-
-
+# def Access(RW,addr):
+# 	print(RW,addr)
+print(cache)
+print(len(cache))
+print(cacheTracker)
+print("Cache Miss Rate: {0:.2f}%".format((100/cacheTracker['Cache Accesses']) * cacheTracker['Cache Misses']),sep="")
 file.close()

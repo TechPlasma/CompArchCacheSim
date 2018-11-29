@@ -1,19 +1,46 @@
 import sys
+tagStart = 0
+indexStart = 7
+offsetStart = 12
 
-
-print ('Number of arguments:', len(sys.argv), 'arguments.')
-print ('Argument List:', str(sys.argv))
-
-CacheDict = {'Tag': 0, 'Valid': 0, 'Data': 0}
+cacheTracker = {'Cache Hits': 0, 'Cache Misses': 0,'Cache Accesses': 0}
+cache = {}
+cacheQue = []
 
 def Access(RW,addr):
-    CacheDict = {'Tag': 0, 'Valid': 0, 'Data': 0}
-    L=[]
-    if addr in CacheDict.keys():
-        L[0] = addr
-    elif  addr not in CacheDict.keys():
-         L.pop()
+	tag = addr[indexStart:]
+	loc = addr
+	cacheTracker['Cache Accesses'] += 1
+	if tag in cache:
+		#print("Cache Hit")
+		cacheTracker['Cache Hits'] += 1
+		CacheHit(loc,tag)
+	elif  tag not in cache:
+		#print("Cache Miss")
+		cacheTracker['Cache Misses'] += 1
+		CacheMiss(loc,tag)
+	#print(tag)
+	#print(cache)
+	#print(cacheQue)
 
+def CacheHit(loc,tag):
+	cacheQue.remove(tag)
+	cacheQue.insert(0,tag)
+	cache[tag] = loc
+
+def CacheMiss(loc,tag):
+	if(len(cache) < 32):
+		cache[tag] = loc
+		cacheQue.insert(0,tag)
+	else:
+		del cache[cacheQue.pop()]
+		cache[tag] = loc
+		cacheQue.insert(0,tag)
+
+
+## Todo
+#	- Implement Set Associative Cache
+#	- 
 
 
 #Check if in cache
