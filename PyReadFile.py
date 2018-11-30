@@ -2,7 +2,13 @@
 
 import sys
 
-from cachesim import Access,cacheTracker,cache
+from cachesim import Access,CalculateTagIndexOffset,cacheTracker,cache
+
+cacheSize = 48		# Number of Bits
+cacheLineSize = 6	# Bytes 2^6
+cacheWay = 4 		# 16 Way Set Associative Cache	
+
+CalculateTagIndexOffset(cacheSize,cacheLineSize,cacheWay)
 
 if len(sys.argv) < 2:
 	print("filename needed as command argument")
