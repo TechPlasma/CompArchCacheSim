@@ -48,15 +48,13 @@ def SetUpSetAssocCache():
 def AccessSAC(RW,addr):
 	addr = int(addr,16)
 
-	
-
 	offset = addr & mask(blockSize)
 	setNum = addr >> blockSize & mask(setBits)
 	tag    = addr >> (setBits+blockSize) & mask(tagBits)
 
-	print("offset Mask: ",bin(offset))
-	print("SetNum Mask: ",bin(setNum))
-	print("Tag    Mask: ",bin(tag))
+	# print("offset Mask: ",bin(offset))
+	# print("SetNum Mask: ",bin(setNum))
+	# print("Tag    Mask: ",bin(tag))
 
 	#print(bin(addr))
 	#print(bin(tag),bin(setNum),bin(offset))
@@ -72,9 +70,6 @@ def AccessSAC(RW,addr):
 		#print("Cache Miss")
 		cacheTracker['Cache Misses'] += 1
 		SACacheMiss(tag,setNum,offset)
-	#print(tag)
-	#print(cache)
-	#print(setAssocCache[setNum]["queue"])
 
 def SACacheHit(tag,setNum,offset):
 	setAssocCache[setNum]["queue"].remove(tag)
@@ -129,7 +124,10 @@ while True:
 	elif(dataTuple == -1):
 		continue
 	else:
-		AccessSAC(dataTuple[1],dataTuple[2])
+		try:
+			AccessSAC(dataTuple[1],dataTuple[2])
+		except Exception as e:
+			continue
 
 
 print(cacheTracker)
