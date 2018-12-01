@@ -17,3 +17,7 @@ scale = 16 ## equals to hexadecimal
 num_of_bits = 48
 
 print(bin(int(hexdata, scale))[2:].zfill(num_of_bits))
+
+print("Hex Conversion Test")
+print(int("0x348",16))
+print(int("348",16))
