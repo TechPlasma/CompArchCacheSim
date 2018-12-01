@@ -18,6 +18,13 @@ tagBits = 0
 
 cacheTracker = {'Cache Hits': 0, 'Cache Misses': 0,'Cache Accesses': 0}
 setAssocCache = []
+programLine = 0
+
+useRange = False
+rangeStart = 0
+rangeStop = 0
+
+useFIFO = False
 
 
 
@@ -52,15 +59,15 @@ def AccessSAC(RW,addr):
 	setNum = addr >> blockSize & mask(setBits)
 	tag    = addr >> (setBits+blockSize) & mask(tagBits)
 
-	# print("offset Mask: ",bin(offset))
-	# print("SetNum Mask: ",bin(setNum))
-	# print("Tag    Mask: ",bin(tag))
+	print("offset Mask: ",bin(offset))
+	print("SetNum Mask: ",bin(setNum))
+	print("Tag    Mask: ",bin(tag))
 
 	#print(bin(addr))
 	#print(bin(tag),bin(setNum),bin(offset))
 
 	#return
-	#print(setAssocCache)
+	print(setAssocCache)
 	cacheTracker['Cache Accesses'] += 1
 	if tag in setAssocCache[setNum]:
 		#print("Cache Hit")
@@ -72,8 +79,11 @@ def AccessSAC(RW,addr):
 		SACacheMiss(tag,setNum,offset)
 
 def SACacheHit(tag,setNum,offset):
-	setAssocCache[setNum]["queue"].remove(tag)
-	setAssocCache[setNum]["queue"].insert(0,tag)
+	if(useFIFO == True):
+		pass
+	else:
+		setAssocCache[setNum]["queue"].remove(tag)
+		setAssocCache[setNum]["queue"].insert(0,tag)
 	setAssocCache[setNum][tag] = offset
 
 def SACacheMiss(tag,setNum,offset):
@@ -105,27 +115,48 @@ def mask(amount):
 #
 
 if len(sys.argv) < 5:
-	print("Usage: python3 CacheSim.py <File Name> <Cache Size: 2^N> <Block Size: 2^N> <Cache Ways: 2^N>")
-	print("\t-f USE FIFO instead of LRU")
+	print("Usage: python3 CacheSim.py <File Name> <Cache Size: 2^N> <Block Size: 2^N> <Cache Ways: 2^N> [<Tags>]")
+	print("TAGS:")
+	print("\t-FIFO\t\t\t\t\tUSE FIFO instead of LRU")
+	print("\t-RANGE <Start Line> <Stop Line>\t\tLines of the file to run")
 	sys.exit(1)
 file = open(sys.argv[1],"r")
 cacheSize = int(sys.argv[2])
 blockSize = int(sys.argv[3])
 cacheWays = int(sys.argv[4])
 print("cacheSize: ",cacheSize,"\nblockSize: ",blockSize,"\ncacheWays: ",cacheWays,sep="")
+if(len(sys.argv) > 5):
+	for i in range(len(sys.argv)):
+		if(sys.argv[i] == "-FIFO"):
+			useFIFO = True
+		elif(sys.argv[i] == "-RANGE"):
+			useRange = True
+			rangeStart = int(sys.argv[i+1])
+			rangeStop = int(sys.argv[i+2])
+
+if(useRange):
+	print("Using Range: ",rangeStart,":",rangeStop)
+if(useFIFO):
+	print("Using FIFO")
 
 CalculateValues()
 SetUpSetAssocCache()
 # Call your code in this loop
 while True:
+	programLine +=1
 	dataTuple = ReadFileLine()
+
 	if(dataTuple == None):
 		break
 	elif(dataTuple == -1):
 		continue
 	else:
 		try:
-			AccessSAC(dataTuple[1],dataTuple[2])
+			if(useRange == False or ((useRange == True) and (rangeStart <= programLine <= rangeStop))):
+				print("File Line:",programLine)
+				AccessSAC(dataTuple[1],dataTuple[2])
+			else:
+				continue
 		except Exception as e:
 			continue
 
