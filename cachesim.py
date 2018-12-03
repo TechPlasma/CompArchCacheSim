@@ -59,21 +59,21 @@ def AccessSAC(RW,addr):
 	setNum = addr >> blockSize & mask(setBits)
 	tag    = addr >> (setBits+blockSize) & mask(tagBits)
 
-	print("offset Mask: ",bin(offset))
-	print("SetNum Mask: ",bin(setNum))
-	print("Tag    Mask: ",bin(tag))
+	# print("offset Mask: ",bin(offset))
+	# print("SetNum Mask: ",bin(setNum))
+	# print("Tag    Mask: ",bin(tag))
 
 	#print(bin(addr))
 	#print(bin(tag),bin(setNum),bin(offset))
 
 	#return
-	print(setAssocCache)
+	# print(setAssocCache)
 	cacheTracker['Cache Accesses'] += 1
 	if tag in setAssocCache[setNum]:
 		#print("Cache Hit")
 		cacheTracker['Cache Hits'] += 1
 		SACacheHit(tag,setNum,offset)
-	elif  tag not in setAssocCache[setNum]:
+	elif tag not in setAssocCache[setNum]:
 		#print("Cache Miss")
 		cacheTracker['Cache Misses'] += 1
 		SACacheMiss(tag,setNum,offset)
@@ -87,7 +87,7 @@ def SACacheHit(tag,setNum,offset):
 	setAssocCache[setNum][tag] = offset
 
 def SACacheMiss(tag,setNum,offset):
-	if(len(setAssocCache[setNum]) < 17):
+	if(len(setAssocCache[setNum]) < 2**cacheWays):
 		setAssocCache[setNum][tag] = offset
 		setAssocCache[setNum]["queue"].insert(0,tag)
 	else:
@@ -100,7 +100,7 @@ def CalculateValues():
 	numSets = int((2**cacheSize)/(2**blockSize * 2**cacheWays))
 	setBits = int(math.log(numSets,2))
 	tagBits = cacheSize - blockSize - setBits
-	print("NumSets:",numSets,"\nSetBits:",setBits,"\nTagBits:",tagBits)
+	# print("NumSets:",numSets,"\nSetBits:",setBits,"\nTagBits:",tagBits)
 
 def mask(amount):
 	return 2**amount -1
@@ -124,7 +124,7 @@ file = open(sys.argv[1],"r")
 cacheSize = int(sys.argv[2])
 blockSize = int(sys.argv[3])
 cacheWays = int(sys.argv[4])
-print("cacheSize: ",cacheSize,"\nblockSize: ",blockSize,"\ncacheWays: ",cacheWays,sep="")
+# print("cacheSize: ",cacheSize,"\nblockSize: ",blockSize,"\ncacheWays: ",cacheWays,sep="")
 if(len(sys.argv) > 5):
 	for i in range(len(sys.argv)):
 		if(sys.argv[i] == "-FIFO"):
@@ -135,9 +135,11 @@ if(len(sys.argv) > 5):
 			rangeStop = int(sys.argv[i+2])
 
 if(useRange):
-	print("Using Range: ",rangeStart,":",rangeStop)
+	# print("Using Range: ",rangeStart,":",rangeStop)
+	pass
 if(useFIFO):
-	print("Using FIFO")
+	# print("Using FIFO")
+	pass
 
 CalculateValues()
 SetUpSetAssocCache()
@@ -153,14 +155,14 @@ while True:
 	else:
 		try:
 			if(useRange == False or ((useRange == True) and (rangeStart <= programLine <= rangeStop))):
-				print("File Line:",programLine)
+				# print("File Line:",programLine)
 				AccessSAC(dataTuple[1],dataTuple[2])
 			else:
 				continue
 		except Exception as e:
 			continue
 
-
-print(cacheTracker)
+# print(setAssocCache)
+# print(cacheTracker)
 print("Cache Miss Rate: {0:.2f}%".format((100/cacheTracker['Cache Accesses']) * cacheTracker['Cache Misses']),sep="")
 file.close()
